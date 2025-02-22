@@ -1,27 +1,36 @@
 @import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap");
 @import "tailwindcss";
 
-@layer reset {
-  :root {
-    font-family: Roboto, system-ui, Avenir, Helvetica, Arial, sans-serif;
-    line-height: 1.5;
-    font-weight: 400;
+@theme {
+    --color-active-light: #7b61ff80;
+    --color-active-dark: #7b61ff80;
+    --color-secondary: #bac6fc;
+    --color-square-light: #f4f7fa;
+    --color-square-dark: #b7c0d8;
+    --color-piece: #34364c;
+}
 
-    font-synthesis: none;
-    text-rendering: optimizeLegibility;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
+@layer reset {
+    :root {
+        font-family: Roboto, system-ui, Avenir, Helvetica, Arial, sans-serif;
+        line-height: 1.5;
+        font-weight: 400;
+
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
 }
 
 @layer utilities {
-  /* Hide scrollbar for Chrome, Safari and Opera */
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  /* Hide scrollbar for IE, Edge and Firefox */
-  .no-scrollbar {
-    -ms-overflow-style: none; /* IE and Edge */
-    scrollbar-width: none; /* Firefox */
-  }
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    /* Hide scrollbar for IE, Edge and Firefox */
+    .no-scrollbar {
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+    }
 }
