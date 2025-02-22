@@ -12,8 +12,6 @@ import { Ranks, Files, pc2Text } from "@/constants/board";
 
 import { useChess } from "@/context/ChessContext";
 
-import { useWindowSize } from "@/hooks/useWindowSize";
-
 function Board() {
     const { chess, isAtTheTop, isAtTheBottom, addToHistory, capturePiece } = useChess();
 
@@ -34,8 +32,6 @@ function Board() {
     });
 
     const boardRef = useRef<HTMLDivElement>(null);
-
-    const [width, _] = useWindowSize();
 
     const createBoard = useCallback(
         (
@@ -124,7 +120,7 @@ function Board() {
             // Get the board position to display the popup near the promotion square
             const rect = boardRef.current?.getBoundingClientRect();
             if (rect) {
-                const x = (endSquare.charCodeAt(0) - "a".charCodeAt(0)) * (rect.width / 8) + (width < 1024 ? 20 : 28);
+                const x = (endSquare.charCodeAt(0) - "a".charCodeAt(0)) * (rect.width / 8) + 28;
                 const y = chess.turn() === "w" ? 2 : rect.height;
 
                 setPromotionPopup({
@@ -179,13 +175,10 @@ function Board() {
     }
 
     return (
-        <div className="relative h-[406px] w-[406px] lg:h-[520px] lg:w-[520px]">
-            <div className="relative flex h-full w-full items-center justify-center rounded-lg border bg-white pt-2 pr-2 pb-6 pl-6 lg:pb-8 lg:pl-8">
+        <div className="relative h-[544px] w-[544px] rounded-md border border-gray-400">
+            <div className="relative flex h-full w-full items-center justify-center rounded-lg bg-white p-8">
                 <DndContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
-                    <div
-                        ref={boardRef}
-                        className="grid h-[360px] w-[360px] grid-cols-8 grid-rows-8 lg:h-[480px] lg:w-[480px]"
-                    >
+                    <div ref={boardRef} className="grid h-[480px] w-[480px] grid-cols-8 grid-rows-8">
                         {boardState}
                     </div>
                 </DndContext>
@@ -197,7 +190,7 @@ function Board() {
                             top: promotionPopup.position.y,
                             zIndex: 20,
                         }}
-                        className="flex h-[188px] w-[51px] flex-col items-center justify-center rounded bg-white p-1 shadow-md lg:h-[288px] lg:w-[68px]"
+                        className="flex h-[288px] w-[68px] flex-col items-center justify-center rounded bg-white p-1 shadow-md"
                     >
                         {["queen", "rook", "bishop", "knight"].map((piece) => {
                             return (
@@ -205,7 +198,7 @@ function Board() {
                                     type="button"
                                     key={piece}
                                     onClick={() => handlePromotionChoice(piece as PieceSymbol)}
-                                    className="flex h-[45px] w-[45px] items-center justify-center bg-white lg:h-[60px] lg:w-[60px]"
+                                    className="flex h-[60px] w-[60px] items-center justify-center bg-white"
                                 >
                                     <div
                                         style={{
@@ -223,21 +216,20 @@ function Board() {
                     </div>
                 )}
                 {/* Ranks and Files Markers */}
-                <div className="absolute top-0 left-0 flex h-full w-6 flex-col items-center justify-start bg-transparent pt-2 lg:w-8">
-                    {[8, 7, 6, 5, 4, 3, 2, 1].map((num) => (
-                        <p
-                            key={num}
-                            className="flex h-[45px] w-2 items-center justify-center text-sm font-medium lg:h-[60px] lg:text-xl"
-                        >
-                            {num}
-                        </p>
-                    ))}
+                <div className="absolute top-0 left-0 flex h-full w-8 flex-col items-center justify-start bg-transparent pt-6">
+                    {Ranks.slice()
+                        .reverse()
+                        .map((num: number) => (
+                            <p key={num} className="flex h-[60px] w-2 items-center justify-center text-xl font-medium">
+                                {num}
+                            </p>
+                        ))}
                 </div>
-                <div className="absolute bottom-0 left-0 flex h-6 w-full flex-row items-center justify-end bg-transparent pr-2 lg:h-8">
-                    {["a", "b", "c", "d", "e", "f", "g", "h"].map((num) => (
+                <div className="absolute bottom-0 left-0 flex h-8 w-full flex-row items-center justify-end bg-transparent pr-6">
+                    {Files.map((num) => (
                         <p
                             key={num}
-                            className="flex h-2 w-[45px] items-center justify-center text-sm font-medium uppercase lg:w-[60px] lg:text-xl"
+                            className="flex h-2 w-[60px] items-center justify-center text-xl font-medium uppercase"
                         >
                             {num}
                         </p>
