@@ -22,7 +22,25 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/context/*": [
+        "src/utilities/context/*"
+      ],
+      "@/components/*": [
+        "src/components/*"
+      ],
+      "@/hooks/*": [
+        "src/utilities/hooks/*"
+      ],
+      "@/images/*": [
+        "src/assets/*"
+      ],
+      "@/constants/*": [
+        "src/utilities/constants/*"
+      ]
+    }
   },
   "include": [
     "src"

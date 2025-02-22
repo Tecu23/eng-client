@@ -15,16 +15,11 @@ import { useChess } from "@/context/ChessContext";
 import { useWindowSize } from "@/hooks/useWindowSize";
 
 function Board() {
-    const { chess, isAtTheTop, isAtTheBottom, addToHistory, capturePiece } =
-        useChess();
+    const { chess, isAtTheTop, isAtTheBottom, addToHistory, capturePiece } = useChess();
 
     const [fromSq, setFromSq] = useState<string | undefined>(undefined);
-    const [lastMoveFromSq, setLastMoveFromSq] = useState<string | undefined>(
-        undefined,
-    );
-    const [lastMoveToSq, setLastMoveToSq] = useState<string | undefined>(
-        undefined,
-    );
+    const [lastMoveFromSq, setLastMoveFromSq] = useState<string | undefined>(undefined);
+    const [lastMoveToSq, setLastMoveToSq] = useState<string | undefined>(undefined);
 
     const [promotionPopup, setPromotionPopup] = useState<{
         visible: boolean;
@@ -60,19 +55,13 @@ function Board() {
             for (let r = 0; r < b.length; r++) {
                 for (let f = 0; f < b[0].length; f++) {
                     const squareValue = Files[f].toLowerCase() + Ranks[7 - r];
-                    const isPossibleMove = possibleMoves.some(
-                        (m: Move) => m.to === squareValue,
-                    );
+                    const isPossibleMove = possibleMoves.some((m: Move) => m.to === squareValue);
                     const sq = b[r][f];
 
                     const getClassName = () => {
-                        if (fromSq && squareValue === fromSq)
-                            return "bg-active-light";
-                        if (toSq && squareValue === toSq)
-                            return "bg-active-dark";
-                        return ((f + r) & 1) === 0
-                            ? "bg-square-dark"
-                            : "bg-square-light";
+                        if (fromSq && squareValue === fromSq) return "bg-active-light";
+                        if (toSq && squareValue === toSq) return "bg-active-dark";
+                        return ((f + r) & 1) === 0 ? "bg-square-dark" : "bg-square-light";
                     };
 
                     board.push(
@@ -100,9 +89,7 @@ function Board() {
         [],
     );
 
-    const [boardState, setBoardState] = useState<Array<React.JSX.Element>>(
-        createBoard(chess.board(), []),
-    );
+    const [boardState, setBoardState] = useState<Array<React.JSX.Element>>(createBoard(chess.board(), []));
 
     function onDragStart(e: DragStartEvent) {
         const startSquare = e.active.data.current?.sq;
@@ -112,14 +99,7 @@ function Board() {
                 square: startSquare,
                 verbose: true,
             });
-            setBoardState(
-                createBoard(
-                    chess.board(),
-                    possibleMoves,
-                    lastMoveFromSq,
-                    lastMoveToSq,
-                ),
-            );
+            setBoardState(createBoard(chess.board(), possibleMoves, lastMoveFromSq, lastMoveToSq));
         }
     }
 
@@ -127,26 +107,24 @@ function Board() {
         const endSquare = e.over?.data.current?.sq;
 
         if (!endSquare || !fromSq) {
-            setBoardState(
-                createBoard(chess.board(), [], lastMoveFromSq, lastMoveToSq),
-            );
+            setBoardState(createBoard(chess.board(), [], lastMoveFromSq, lastMoveToSq));
+            return;
+        }
+
+        if (endSquare == fromSq) {
+            setBoardState(createBoard(chess.board(), [], lastMoveFromSq, lastMoveToSq));
             return;
         }
 
         const isPromotion =
             chess.get(fromSq as SquareType)?.type === "p" &&
-            (chess.turn() === "w"
-                ? isAtTheTop(endSquare)
-                : isAtTheBottom(endSquare));
+            (chess.turn() === "w" ? isAtTheTop(endSquare) : isAtTheBottom(endSquare));
 
         if (isPromotion) {
             // Get the board position to display the popup near the promotion square
             const rect = boardRef.current?.getBoundingClientRect();
             if (rect) {
-                const x =
-                    (endSquare.charCodeAt(0) - "a".charCodeAt(0)) *
-                        (rect.width / 8) +
-                    (width < 1024 ? 20 : 28);
+                const x = (endSquare.charCodeAt(0) - "a".charCodeAt(0)) * (rect.width / 8) + (width < 1024 ? 20 : 28);
                 const y = chess.turn() === "w" ? 2 : rect.height;
 
                 setPromotionPopup({
@@ -190,9 +168,7 @@ function Board() {
 
             setLastMoveFromSq(fromSq);
             setLastMoveToSq(promotionPopup.square);
-            setBoardState(
-                createBoard(chess.board(), [], fromSq, promotionPopup.square),
-            );
+            setBoardState(createBoard(chess.board(), [], fromSq, promotionPopup.square));
             setPromotionPopup({
                 visible: false,
                 position: { x: 0, y: 0 },
@@ -228,11 +204,7 @@ function Board() {
                                 <button
                                     type="button"
                                     key={piece}
-                                    onClick={() =>
-                                        handlePromotionChoice(
-                                            piece as PieceSymbol,
-                                        )
-                                    }
+                                    onClick={() => handlePromotionChoice(piece as PieceSymbol)}
                                     className="flex h-[45px] w-[45px] items-center justify-center bg-white lg:h-[60px] lg:w-[60px]"
                                 >
                                     <div
