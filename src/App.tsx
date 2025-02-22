@@ -1,8 +1,10 @@
 import Game from "@/components/game/Game";
+import Header from "@/components/layout/Header";
 
 const App = () => {
     return (
-        <main className="flex min-h-screen items-center justify-center">
+        <main className="">
+            <Header />
             <Game />
         </main>
     );
