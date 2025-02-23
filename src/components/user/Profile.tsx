@@ -1,5 +1,3 @@
-import { useWindowSize } from "@/hooks/useWindowSize";
-
 type Props = {
     capturedPieces: string[];
     color: "w" | "b";
@@ -13,24 +11,24 @@ const Profile = ({ capturedPieces, color, name, elo }: Props) => {
     const queens = capturedPieces.filter((p) => p.toLowerCase() === "q");
     const knights = capturedPieces.filter((p) => p.toLowerCase() === "q");
 
-    const [width, _] = useWindowSize();
-
     return (
-        <div className="flex h-24 w-full items-center justify-between py-4 lg:h-32">
-            <div className="flex flex-row items-center gap-4">
+        <>
+            <div className="flex items-center gap-2 px-4 py-2">
+                <div className="flex h-12 w-24 items-center justify-center rounded-md bg-green-200">
+                    <p className="font-mono text-xl font-semibold">10:00</p>
+                </div>
                 <div className="h-16 w-16 flex-auto flex-shrink-0 flex-grow-0 lg:h-24 lg:w-24">
                     <img src={"pieces/rook_b.svg"} alt="computer_profile" className="h-full w-full" />
                 </div>
-                <div className="flex h-16 flex-col items-start justify-start gap-2 py-1 lg:h-24">
+                <div className="flex h-16 flex-shrink flex-grow flex-col">
                     <div className="flex items-center gap-2">
-                        <p className="text-piece text-base font-semibold lg:text-2xl">{name}</p>
-                        <p className="text-piece text-base font-semibold lg:text-2xl">({elo})</p>
+                        <p className="text-piece text-base font-semibold">{name}</p>
+                        <p className="text-piece text-base font-semibold">({elo})</p>
                     </div>
-                    <div className="relative flex items-center justify-start">
+                    <div className="relative flex flex-shrink flex-grow items-center justify-start">
                         <div
                             style={{
-                                minWidth: pawns.length > 0 ? (width < 1024 ? 30 : 50) : 0,
-                                width: pawns.length * (width < 1024 ? 16 : 24),
+                                width: pawns.length == 0 ? 0 : 30 + (pawns.length - 1) * 10 + 5,
                             }}
                             className="relative h-full"
                         >
@@ -38,8 +36,8 @@ const Profile = ({ capturedPieces, color, name, elo }: Props) => {
                                 return (
                                     <div
                                         key={piece + idx}
-                                        className="absolute flex h-8 w-8 lg:h-12 lg:w-12"
-                                        style={{ left: (width < 1024 ? 10 : 14) * idx - 5, top: 0 }}
+                                        className="absolute top-1/2 flex h-8 w-8 -translate-y-1/2 transform"
+                                        style={{ left: 10 * idx - 5 }}
                                     >
                                         <div
                                             style={{
@@ -57,17 +55,16 @@ const Profile = ({ capturedPieces, color, name, elo }: Props) => {
                         </div>
                         <div
                             style={{
-                                minWidth: knights.length > 0 ? (width < 1024 ? 30 : 50) : 0,
-                                width: knights.length * (width < 1024 ? 14 : 26),
+                                width: knights.length == 0 ? 0 : 30 + (knights.length - 1) * 12 + 5,
                             }}
-                            className="relative"
+                            className="relative h-full"
                         >
                             {knights.map((piece, idx) => {
                                 return (
                                     <div
                                         key={piece + idx}
-                                        className="absolute flex h-8 w-8 lg:h-12 lg:w-12"
-                                        style={{ left: (width < 1024 ? 12 : 16) * idx - 5 }}
+                                        className="absolute top-1/2 flex h-8 w-8 -translate-y-1/2 transform"
+                                        style={{ left: 12 * idx - 5 }}
                                     >
                                         <div
                                             style={{
@@ -85,17 +82,16 @@ const Profile = ({ capturedPieces, color, name, elo }: Props) => {
                         </div>
                         <div
                             style={{
-                                minWidth: bishops.length > 0 ? (width < 1024 ? 30 : 50) : 0,
-                                width: bishops.length * (width < 1024 ? 14 : 26),
+                                width: bishops.length == 0 ? 0 : 30 + (bishops.length - 1) * 10 + 5,
                             }}
-                            className="relative"
+                            className="relative h-full"
                         >
                             {bishops.map((piece, idx) => {
                                 return (
                                     <div
                                         key={piece + idx}
-                                        className="absolute flex h-8 w-8 lg:h-12 lg:w-12"
-                                        style={{ left: (width < 1024 ? 10 : 16) * idx - 5 }}
+                                        className="absolute top-1/2 h-8 w-8 -translate-y-1/2 transform"
+                                        style={{ left: 10 * idx - 5 }}
                                     >
                                         <div
                                             style={{
@@ -113,17 +109,16 @@ const Profile = ({ capturedPieces, color, name, elo }: Props) => {
                         </div>
                         <div
                             style={{
-                                minWidth: rooks.length > 0 ? (width < 1024 ? 30 : 50) : 0,
-                                width: rooks.length * (width < 1024 ? 17 : 26),
+                                width: rooks.length == 0 ? 0 : 30 + (rooks.length - 1) * 10 + 5,
                             }}
-                            className="relative"
+                            className="relative h-full"
                         >
                             {rooks.map((piece, idx) => {
                                 return (
                                     <div
                                         key={piece + idx}
-                                        className="absolute flex h-8 w-8 lg:h-12 lg:w-12"
-                                        style={{ left: (width < 1024 ? 10 : 16) * idx - 5 }}
+                                        className="absolute top-1/2 flex h-8 w-8 -translate-y-1/2 transform"
+                                        style={{ left: 10 * idx - 5 }}
                                     >
                                         <div
                                             style={{
@@ -139,13 +134,13 @@ const Profile = ({ capturedPieces, color, name, elo }: Props) => {
                                 );
                             })}
                         </div>
-                        <div className="relative">
+                        <div className="relative h-full">
                             {queens.map((piece, idx) => {
                                 return (
                                     <div
                                         key={piece + idx}
-                                        className="absolute flex h-8 w-8 lg:h-12 lg:w-12"
-                                        style={{ left: (width < 1024 ? 10 : 18) * idx - 5 }}
+                                        className="absolute top-1/2 flex h-8 w-8 -translate-y-1/2 transform"
+                                        style={{ left: 12 * idx - 5 }}
                                     >
                                         <div
                                             style={{
@@ -164,7 +159,7 @@ const Profile = ({ capturedPieces, color, name, elo }: Props) => {
                     </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 };
 
