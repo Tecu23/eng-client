@@ -1,10 +1,18 @@
+import { Color } from "chess.js";
+
 // Outbound Messages from Client To Server
 type OutboundMessagesPayloadMap = {
-    create_session: {
-        time_control: { white_time: number; black_time: number; white_increment: number; black_increment: number };
-        color: string;
+    CREATE_SESSION: {
+        time_control: {
+            white_time: number;
+            black_time: number;
+            white_increment: number;
+            black_increment: number;
+        };
+        color: Color;
+        initial_fen: string;
     };
-    make_move: { game_session: string };
+    MAKE_MOVE: { game_session: string };
 };
 
 export type OutboundMessage = {

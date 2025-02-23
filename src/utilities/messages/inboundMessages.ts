@@ -1,6 +1,9 @@
+import { Color } from "chess.js";
+
 type InboundMessagesPayloadMap = {
-    connected: { connectionId: string };
-    game_created: { fen: string };
+    CONNECTED: { connectionId: string };
+    GAME_CREATED: { game_id: string; initial_fen: string; white_time: number; black_time: number; current_turn: Color };
+    TIME_UPDATE: { color: Color; remaining: number };
 };
 
 export type InboundMessage = {
