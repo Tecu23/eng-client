@@ -1,110 +1,29 @@
-import React, { useRef, useState, useCallback, useEffect } from "react";
+import React, { useRef, useState, useEffect } from "react";
 
-import type { Square as SquareType, PieceSymbol, Color, Move } from "chess.js";
+import type { Square as SquareType, PieceSymbol, Move } from "chess.js";
 
 import { DndContext } from "@dnd-kit/core";
 import type { DragEndEvent, DragStartEvent } from "@dnd-kit/core";
 
-import Square from "@/components/game/Square";
-import Piece from "@/components/game/Piece";
-
-import { Ranks, Files, pc2Text } from "@/constants/board";
+import { Ranks, Files } from "@/constants/board";
 
 import { useChess } from "@/context/ChessContext";
 import useWebsocket from "@/hooks/useWebSocket";
 
 function Board() {
-    const { chess, isAtTheTop, isAtTheBottom, addToHistory, capturePiece } = useChess();
+    const boardRef = useRef<HTMLDivElement>(null);
+    const { chess, createBoard, isAtTheTop, isAtTheBottom, addToHistory, capturePiece } = useChess();
 
     const [fromSq, setFromSq] = useState<string | undefined>(undefined);
-    const [lastMoveFromSq, setLastMoveFromSq] = useState<string | undefined>(undefined);
-    const [lastMoveToSq, setLastMoveToSq] = useState<string | undefined>(undefined);
 
     const [promotionPopup, setPromotionPopup] = useState<{
         visible: boolean;
         position: { x: number; y: number };
         square: string | null;
         color: "w" | "b";
-    }>({
-        visible: false,
-        position: { x: 0, y: 0 },
-        square: null,
-        color: "w",
-    });
-
-    const boardRef = useRef<HTMLDivElement>(null);
+    }>({ visible: false, position: { x: 0, y: 0 }, square: null, color: "w" });
 
     const { sendMessage, isConnected } = useWebsocket(import.meta.env.VITE_WEBSOCKET_PATH || "ws://localhost:8080");
-
-    useEffect(() => {
-        console.log(isConnected);
-        if (isConnected) {
-            const payload = {
-                color: "white",
-                time_control: {
-                    white_time: 300,
-                    black_time: 300,
-                    white_increment: 0,
-                    black_increment: 0,
-                    moves_to_go: 40,
-                },
-            };
-
-            sendMessage({ type: "START_NEW_GAME", payload: payload });
-        }
-    }, [isConnected]);
-
-    const createBoard = useCallback(
-        (
-            b: Array<
-                Array<{
-                    square: SquareType;
-                    type: PieceSymbol;
-                    color: Color;
-                } | null>
-            >,
-            possibleMoves: Array<Move>,
-            fromSq?: string,
-            toSq?: string,
-        ): Array<React.JSX.Element> => {
-            const board: Array<React.JSX.Element> = [];
-
-            for (let r = 0; r < b.length; r++) {
-                for (let f = 0; f < b[0].length; f++) {
-                    const squareValue = Files[f].toLowerCase() + Ranks[7 - r];
-                    const isPossibleMove = possibleMoves.some((m: Move) => m.to === squareValue);
-                    const sq = b[r][f];
-
-                    const getClassName = () => {
-                        if (fromSq && squareValue === fromSq) return "bg-active-light";
-                        if (toSq && squareValue === toSq) return "bg-active-dark";
-                        return ((f + r) & 1) === 0 ? "bg-square-dark" : "bg-square-light";
-                    };
-
-                    board.push(
-                        <Square
-                            isPossibleMove={isPossibleMove}
-                            className={getClassName()}
-                            key={squareValue}
-                            sq={squareValue}
-                            piece={
-                                sq ? (
-                                    <Piece
-                                        color={sq.color}
-                                        type={sq.type}
-                                        sq={squareValue}
-                                        image={`pieces/${pc2Text[sq.type]}_${sq.color}.svg`}
-                                    />
-                                ) : undefined
-                            }
-                        />,
-                    );
-                }
-            }
-            return board;
-        },
-        [],
-    );
 
     const [boardState, setBoardState] = useState<Array<React.JSX.Element>>(createBoard(chess.board(), []));
 
@@ -116,7 +35,12 @@ function Board() {
                 square: startSquare,
                 verbose: true,
             });
-            setBoardState(createBoard(chess.board(), possibleMoves, lastMoveFromSq, lastMoveToSq));
+            possibleMoves.forEach((move: Move) => {
+                const elem = document.querySelector(`#${move.to}`);
+                if (elem != null) {
+                    elem.classList.add("possible-move");
+                }
+            });
         }
     }
 
@@ -124,12 +48,18 @@ function Board() {
         const endSquare = e.over?.data.current?.sq;
 
         if (!endSquare || !fromSq) {
-            setBoardState(createBoard(chess.board(), [], lastMoveFromSq, lastMoveToSq));
+            const elems = document.querySelectorAll(`.possible-move`);
+            elems.forEach((elem) => {
+                elem.classList.remove("possible-move");
+            });
             return;
         }
 
         if (endSquare == fromSq) {
-            setBoardState(createBoard(chess.board(), [], lastMoveFromSq, lastMoveToSq));
+            const elems = document.querySelectorAll(`.possible-move`);
+            elems.forEach((elem) => {
+                elem.classList.remove("possible-move");
+            });
             return;
         }
 
@@ -162,8 +92,10 @@ function Board() {
                 capturePiece(move.captured as PieceSymbol, move.color);
             }
 
-            setLastMoveFromSq(fromSq);
-            setLastMoveToSq(endSquare);
+            const elems = document.querySelectorAll(`.possible-move`);
+            elems.forEach((elem) => {
+                elem.classList.remove("possible-move");
+            });
 
             setBoardState(createBoard(chess.board(), [], fromSq, endSquare));
         } catch (error) {
@@ -183,8 +115,6 @@ function Board() {
                 capturePiece(move.captured as PieceSymbol, move.color);
             }
 
-            setLastMoveFromSq(fromSq);
-            setLastMoveToSq(promotionPopup.square);
             setBoardState(createBoard(chess.board(), [], fromSq, promotionPopup.square));
             setPromotionPopup({
                 visible: false,
@@ -194,6 +124,24 @@ function Board() {
             });
         }
     }
+
+    useEffect(() => {
+        console.log(isConnected);
+        if (isConnected) {
+            const payload = {
+                color: "white",
+                time_control: {
+                    white_time: 300,
+                    black_time: 300,
+                    white_increment: 0,
+                    black_increment: 0,
+                    moves_to_go: 40,
+                },
+            };
+
+            sendMessage({ type: "START_NEW_GAME", payload: payload });
+        }
+    }, [isConnected]);
 
     return (
         <div className="relative h-[544px] w-[544px] rounded-md border border-gray-400">

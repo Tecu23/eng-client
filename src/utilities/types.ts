@@ -1,25 +1,33 @@
+import React from "react";
 import type { Dispatch } from "react";
 
-import type { Chess, Move, PieceSymbol, Square, Color } from "chess.js";
+import type { Chess, Move, PieceSymbol, Square as SquareType, Color } from "chess.js";
 
 export interface PieceType {
-  type: string;
-  color: string;
+    type: string;
+    color: string;
 }
 
 export interface ChessContextValue {
-  chess: Chess;
-  possibleMoves: Move[];
+    createBoard: (
+        b: Array<Array<{ square: SquareType; type: PieceSymbol; color: Color } | null>>,
+        possibleMoves: Array<Move>,
+        fromSq?: string,
+        toSq?: string,
+    ) => Array<React.JSX.Element>;
 
-  moveHistory: Move[];
-  addToHistory: (move: Move) => void;
+    chess: Chess;
+    possibleMoves: Move[];
 
-  setPossibleMoves: Dispatch<React.SetStateAction<Array<Move>>>;
-  isAtTheTop: (arg: Square) => boolean;
-  isAtTheBottom: (arg: Square) => boolean;
+    moveHistory: Move[];
+    addToHistory: (move: Move) => void;
 
-  capturedBlackPieces: PieceSymbol[];
-  capturedWhitePieces: PieceSymbol[];
+    setPossibleMoves: Dispatch<React.SetStateAction<Array<Move>>>;
+    isAtTheTop: (arg: SquareType) => boolean;
+    isAtTheBottom: (arg: SquareType) => boolean;
 
-  capturePiece: (piece: PieceSymbol, color: Color) => void;
+    capturedBlackPieces: PieceSymbol[];
+    capturedWhitePieces: PieceSymbol[];
+
+    capturePiece: (piece: PieceSymbol, color: Color) => void;
 }

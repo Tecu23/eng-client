@@ -23,6 +23,20 @@
     }
 }
 
+@layer base {
+}
+
+@layer components {
+    .possible-move::after {
+        content: "";
+        background-color: var(--color-active-light);
+        position: absolute;
+        width: 1rem;
+        height: 1rem;
+        border-radius: 100%;
+    }
+}
+
 @layer utilities {
     /* Hide scrollbar for Chrome, Safari and Opera */
     .no-scrollbar::-webkit-scrollbar {
