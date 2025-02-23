@@ -1,4 +1,4 @@
-import React, { useRef, useState, useCallback } from "react";
+import React, { useRef, useState, useCallback, useEffect } from "react";
 
 import type { Square as SquareType, PieceSymbol, Color, Move } from "chess.js";
 
@@ -11,6 +11,7 @@ import Piece from "@/components/game/Piece";
 import { Ranks, Files, pc2Text } from "@/constants/board";
 
 import { useChess } from "@/context/ChessContext";
+import useWebsocket from "@/hooks/useWebSocket";
 
 function Board() {
     const { chess, isAtTheTop, isAtTheBottom, addToHistory, capturePiece } = useChess();
@@ -32,6 +33,26 @@ function Board() {
     });
 
     const boardRef = useRef<HTMLDivElement>(null);
+
+    const { sendMessage, isConnected } = useWebsocket(import.meta.env.VITE_WEBSOCKET_PATH || "ws://localhost:8080");
+
+    useEffect(() => {
+        console.log(isConnected);
+        if (isConnected) {
+            const payload = {
+                color: "white",
+                time_control: {
+                    white_time: 300,
+                    black_time: 300,
+                    white_increment: 0,
+                    black_increment: 0,
+                    moves_to_go: 40,
+                },
+            };
+
+            sendMessage({ type: "START_NEW_GAME", payload: payload });
+        }
+    }, [isConnected]);
 
     const createBoard = useCallback(
         (

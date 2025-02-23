@@ -7,10 +7,14 @@ import Evaluation from "./Evaluation";
 function Game() {
     return (
         <ChessProvider>
-            <div className="container mx-auto flex max-w-6xl gap-4">
-                <Evaluation />
-                <Board />
-                <MoveHistory />
+            <div className="container mx-auto my-auto flex flex-col gap-2 lg:flex-row">
+                <div className="flex justify-around gap-2">
+                    <Evaluation />
+                    <Board />
+                </div>
+                <div className="">
+                    <MoveHistory />
+                </div>
             </div>
         </ChessProvider>
     );

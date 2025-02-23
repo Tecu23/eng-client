@@ -1,8 +1,8 @@
 const Header = () => {
     return (
-        <header className="p-1">
+        <header className="w-max-6xl bg-square-light px-2 py-2">
             <div className="flex justify-between">
-                <div>Argo</div>
+                <div className="font-mono text-3xl font-bold">Argo</div>
                 <nav className="">
                     <ul className="">
                         <li className="flex items-center">
