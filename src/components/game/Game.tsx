@@ -1,15 +1,82 @@
 import Board from "@/components/game/Board";
+import Score from "@/components/game/Score";
+import Evaluation from "@/components/game/Evaluation";
 import MoveHistory from "@/components/game/MoveHistory";
 
-import { ChessProvider } from "@/context/ChessContext";
-import Evaluation from "./Evaluation";
-import Score from "./Score";
+import { InboundMessage } from "src/utilities/messages/inboundMessages";
+import { OutboundMessage } from "src/utilities/messages/outboundMessages";
+
+import useWebsocket from "@/hooks/useWebSocket";
+
+import { useChess } from "@/context/ChessContext";
+import { usePopUp } from "@/context/PopUpContext";
+import { StartPosition } from "@/constants/board";
 
 function Game() {
+    const { triggerPopUp } = usePopUp();
+
+    const { updateTime } = useChess();
+
+    const { sendMessage, isConnected } = useWebsocket(
+        import.meta.env.VITE_WEBSOCKET_PATH || "ws://localhost:8080/ws",
+        handleMessages,
+    );
+
+    function handleMessages(message: InboundMessage) {
+        switch (message.event) {
+            case "CONNECTED":
+                triggerPopUp({
+                    header: "Connection Established",
+                    body: `Websocket connected with ID: ${message.payload.connectionId}`,
+                });
+                break;
+            case "GAME_CREATED":
+                break;
+            case "GAME_OVER":
+                break;
+            case "ENGINE_MOVE":
+                break;
+            case "CLOCK_UPDATE":
+                updateTime(message.payload.remaining, message.payload.color);
+                break;
+            case "ERROR":
+                triggerPopUp({
+                    header: "Error",
+                    body: `${message.payload.message}`,
+                });
+                break;
+            default:
+                break;
+        }
+    }
+
     return (
-        <ChessProvider>
+        <>
             <div className="container mx-auto flex justify-between pt-4">
-                <button className="rounded-md bg-cyan-500 p-2 text-base font-semibold text-white">New Game</button>
+                <button
+                    onClick={() => {
+                        if (isConnected) {
+                            const message: OutboundMessage = {
+                                event: "CREATE_SESSION",
+                                payload: {
+                                    color: "w",
+                                    time_control: {
+                                        white_time: 600_000,
+                                        black_time: 600_000,
+                                        white_increment: 0,
+                                        black_increment: 0,
+                                    },
+                                    initial_fen: StartPosition,
+                                },
+                            };
+
+                            sendMessage(message);
+                        }
+                    }}
+                    className="cursor-pointer rounded-md bg-cyan-500 p-2 text-base font-semibold text-white"
+                >
+                    New Game
+                </button>
                 <Score />
             </div>
             <div className="container mx-auto flex flex-col justify-center gap-4 p-4 lg:flex-row">
@@ -19,7 +86,7 @@ function Game() {
                 </div>
                 <MoveHistory />
             </div>
-        </ChessProvider>
+        </>
     );
 }
 

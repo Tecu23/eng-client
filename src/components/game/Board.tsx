@@ -1,23 +1,17 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
 
 import type { Square as SquareType, PieceSymbol, Move } from "chess.js";
 
 import { DndContext } from "@dnd-kit/core";
 import type { DragEndEvent, DragStartEvent } from "@dnd-kit/core";
 
-import { Ranks, Files, StartPosition } from "@/constants/board";
+import { Ranks, Files } from "@/constants/board";
 
 import { useChess } from "@/context/ChessContext";
-import { usePopUp } from "@/context/PopUpContext";
-
-import useWebsocket from "@/hooks/useWebSocket";
-
-import { OutboundMessage } from "src/utilities/messages/outboundMessages";
-import { InboundMessage } from "src/utilities/messages/inboundMessages";
 
 function Board() {
     const boardRef = useRef<HTMLDivElement>(null);
-    const { chess, updateTime, createBoard, isAtTheTop, isAtTheBottom, addToHistory, capturePiece } = useChess();
+    const { chess, createBoard, isAtTheTop, isAtTheBottom, addToHistory, capturePiece } = useChess();
 
     const [fromSq, setFromSq] = useState<string | undefined>(undefined);
 
@@ -28,42 +22,7 @@ function Board() {
         color: "w" | "b";
     }>({ visible: false, position: { x: 0, y: 0 }, square: null, color: "w" });
 
-    const { sendMessage, isConnected } = useWebsocket(
-        import.meta.env.VITE_WEBSOCKET_PATH || "ws://localhost:8080/ws",
-        handleMessages,
-    );
-
-    const { triggerPopUp } = usePopUp();
-
     const [boardState, setBoardState] = useState<Array<React.JSX.Element>>(createBoard(chess.board(), []));
-
-    function handleMessages(message: InboundMessage) {
-        switch (message.event) {
-            case "CONNECTED":
-                triggerPopUp({
-                    header: "Connection Established",
-                    body: `Websocket connected with ID: ${message.payload.connectionId}`,
-                });
-                break;
-            case "GAME_CREATED":
-                break;
-            case "GAME_OVER":
-                break;
-            case "ENGINE_MOVE":
-                break;
-            case "CLOCK_UPDATE":
-                updateTime(message.payload.remaining, message.payload.color);
-                break;
-            case "ERROR":
-                triggerPopUp({
-                    header: "Error",
-                    body: `${message.payload.message}`,
-                });
-                break;
-            default:
-                break;
-        }
-    }
 
     function onDragStart(e: DragStartEvent) {
         const startSquare = e.active.data.current?.sq;
@@ -163,89 +122,74 @@ function Board() {
         }
     }
 
-    useEffect(() => {
-        if (isConnected) {
-            const message: OutboundMessage = {
-                event: "CREATE_SESSION",
-                payload: {
-                    color: "w",
-                    time_control: {
-                        white_time: 600_000,
-                        black_time: 600_000,
-                        white_increment: 0,
-                        black_increment: 0,
-                    },
-                    initial_fen: StartPosition,
-                },
-            };
-
-            sendMessage(message);
-        }
-    }, [isConnected]);
-
     return (
-        <div className="relative h-[544px] w-[544px] rounded-md border border-gray-400">
-            <div className="relative flex h-full w-full items-center justify-center rounded-lg bg-white p-8">
-                <DndContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
-                    <div ref={boardRef} className="grid h-[480px] w-[480px] grid-cols-8 grid-rows-8">
-                        {boardState}
-                    </div>
-                </DndContext>
-                {promotionPopup.visible && (
-                    <div
-                        style={{
-                            position: "absolute",
-                            left: promotionPopup.position.x,
-                            top: promotionPopup.position.y,
-                            zIndex: 20,
-                        }}
-                        className="flex h-[288px] w-[68px] flex-col items-center justify-center rounded bg-white p-1 shadow-md"
-                    >
-                        {["queen", "rook", "bishop", "knight"].map((piece) => {
-                            return (
-                                <button
-                                    type="button"
-                                    key={piece}
-                                    onClick={() => handlePromotionChoice(piece as PieceSymbol)}
-                                    className="flex h-[60px] w-[60px] items-center justify-center bg-white"
-                                >
-                                    <div
-                                        style={{
-                                            width: "80%",
-                                            height: "80%",
+        <>
+            <div className="relative h-[544px] w-[544px] rounded-md border border-gray-400">
+                <div className="relative flex h-full w-full items-center justify-center rounded-lg bg-white p-8">
+                    <DndContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
+                        <div ref={boardRef} className="grid h-[480px] w-[480px] grid-cols-8 grid-rows-8">
+                            {boardState}
+                        </div>
+                    </DndContext>
+                    {promotionPopup.visible && (
+                        <div
+                            style={{
+                                position: "absolute",
+                                left: promotionPopup.position.x,
+                                top: promotionPopup.position.y,
+                                zIndex: 20,
+                            }}
+                            className="flex h-[288px] w-[68px] flex-col items-center justify-center rounded bg-white p-1 shadow-md"
+                        >
+                            {["queen", "rook", "bishop", "knight"].map((piece) => {
+                                return (
+                                    <button
+                                        type="button"
+                                        key={piece}
+                                        onClick={() => handlePromotionChoice(piece as PieceSymbol)}
+                                        className="flex h-[60px] w-[60px] items-center justify-center bg-white"
+                                    >
+                                        <div
+                                            style={{
+                                                width: "80%",
+                                                height: "80%",
 
-                                            backgroundImage: `url(${`pieces/${piece}_${promotionPopup.color}.svg`})`,
-                                            backgroundSize: "cover",
-                                            backgroundRepeat: "no-repeat",
-                                        }}
-                                    />
-                                </button>
-                            );
-                        })}
+                                                backgroundImage: `url(${`pieces/${piece}_${promotionPopup.color}.svg`})`,
+                                                backgroundSize: "cover",
+                                                backgroundRepeat: "no-repeat",
+                                            }}
+                                        />
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    )}
+                    {/* Ranks and Files Markers */}
+                    <div className="absolute top-0 left-0 flex h-full w-8 flex-col items-center justify-start bg-transparent pt-6">
+                        {Ranks.slice()
+                            .reverse()
+                            .map((num: number) => (
+                                <p
+                                    key={num}
+                                    className="flex h-[60px] w-2 items-center justify-center text-xl font-medium"
+                                >
+                                    {num}
+                                </p>
+                            ))}
                     </div>
-                )}
-                {/* Ranks and Files Markers */}
-                <div className="absolute top-0 left-0 flex h-full w-8 flex-col items-center justify-start bg-transparent pt-6">
-                    {Ranks.slice()
-                        .reverse()
-                        .map((num: number) => (
-                            <p key={num} className="flex h-[60px] w-2 items-center justify-center text-xl font-medium">
+                    <div className="absolute bottom-0 left-0 flex h-8 w-full flex-row items-center justify-end bg-transparent pr-6">
+                        {Files.map((num) => (
+                            <p
+                                key={num}
+                                className="flex h-2 w-[60px] items-center justify-center text-xl font-medium uppercase"
+                            >
                                 {num}
                             </p>
                         ))}
-                </div>
-                <div className="absolute bottom-0 left-0 flex h-8 w-full flex-row items-center justify-end bg-transparent pr-6">
-                    {Files.map((num) => (
-                        <p
-                            key={num}
-                            className="flex h-2 w-[60px] items-center justify-center text-xl font-medium uppercase"
-                        >
-                            {num}
-                        </p>
-                    ))}
+                    </div>
                 </div>
             </div>
-        </div>
+        </>
     );
 }
 
