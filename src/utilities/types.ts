@@ -8,7 +8,14 @@ export interface PieceType {
     color: string;
 }
 
+export type GameSettings = {
+    id: string | null;
+    fen: string | null;
+};
+
 export interface ChessContextValue {
+    boardState: Array<React.JSX.Element>;
+    updateBoardState: (b: Array<React.JSX.Element>) => void;
     createBoard: (
         b: Array<Array<{ square: SquareType; type: PieceSymbol; color: Color } | null>>,
         possibleMoves: Array<Move>,
@@ -18,12 +25,16 @@ export interface ChessContextValue {
 
     chess: Chess;
 
+    gameSettings: GameSettings;
+    updateGameSettings: (settings: GameSettings) => void;
+
     whiteTime: number;
     blackTime: number;
-
     updateTime: (time: number, player: Color) => void;
 
     possibleMoves: Move[];
+
+    makeEngineMove: (mv: string) => void;
 
     moveHistory: Move[];
     addToHistory: (move: Move) => void;

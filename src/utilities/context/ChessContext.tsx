@@ -1,4 +1,4 @@
-import { useState, createContext, useContext, useCallback } from "react";
+import React, { useState, createContext, useContext, useCallback, useEffect } from "react";
 import type { ReactNode } from "react";
 
 import Square from "@/components/game/Square";
@@ -7,7 +7,7 @@ import Piece from "@/components/game/Piece";
 import { Chess } from "chess.js";
 import type { Color, Move, PieceSymbol, Square as SquareType } from "chess.js";
 
-import type { ChessContextValue } from "../types";
+import type { ChessContextValue, GameSettings } from "../types";
 
 import { Files, Ranks, pc2Text } from "@/constants/board";
 
@@ -30,6 +30,11 @@ type Props = {
 const ChessProvider = ({ children }: Props) => {
     const [chess] = useState(new Chess());
 
+    const [gameSettings, setGameSettings] = useState<GameSettings>({
+        id: null,
+        fen: null,
+    });
+
     const [whiteTime, setWhiteTime] = useState(600_000);
     const [blackTime, setBlackTime] = useState(600_000);
 
@@ -46,6 +51,8 @@ const ChessProvider = ({ children }: Props) => {
         setMoveHistory([...moveHistory, move]);
     };
 
+    const [boardState, setBoardState] = useState<Array<React.JSX.Element>>([]);
+
     const capturePiece = (piece: PieceSymbol, color: Color) => {
         if (color === "w") {
             setCapturedBlackPieces((prev) => [...prev, piece]);
@@ -60,6 +67,14 @@ const ChessProvider = ({ children }: Props) => {
         } else {
             setBlackTime(time);
         }
+    }, []);
+
+    const updateGameSettings = useCallback((settings: GameSettings) => {
+        setGameSettings(settings);
+    }, []);
+
+    const updateBoardState = useCallback((b: Array<React.JSX.Element>) => {
+        setBoardState(b);
     }, []);
 
     const createBoard = useCallback(
@@ -114,17 +129,49 @@ const ChessProvider = ({ children }: Props) => {
         [],
     );
 
+    const makeEngineMove = useCallback(
+        (mv: string) => {
+            const fromSq = mv.substring(0, 2);
+            const toSq = mv.substring(2, 4);
+
+            const move = chess.move({ from: fromSq, to: toSq });
+            addToHistory(move);
+
+            if (move?.captured) {
+                capturePiece(move.captured as PieceSymbol, move.color);
+            }
+
+            const elems = document.querySelectorAll(`.possible-move`);
+            elems.forEach((elem) => {
+                elem.classList.remove("possible-move");
+            });
+
+            updateBoardState(createBoard(chess.board(), [], fromSq, toSq));
+        },
+        [chess, createBoard, updateBoardState, addToHistory],
+    );
+
+    useEffect(() => {
+        updateBoardState(createBoard(chess.board(), []));
+    }, []);
+
     return (
         <ChessContext.Provider
             value={{
                 chess, // Should probably remove chess from here
 
+                boardState,
+                updateBoardState,
+                createBoard,
+
+                gameSettings,
+                updateGameSettings,
+
                 whiteTime,
                 blackTime,
-
                 updateTime,
 
-                createBoard,
+                makeEngineMove,
 
                 possibleMoves,
                 setPossibleMoves,

@@ -15,7 +15,7 @@ import { StartPosition } from "@/constants/board";
 function Game() {
     const { triggerPopUp } = usePopUp();
 
-    const { updateTime } = useChess();
+    const { updateTime, gameSettings, updateGameSettings, makeEngineMove } = useChess();
 
     const { sendMessage, isConnected } = useWebsocket(
         import.meta.env.VITE_WEBSOCKET_PATH || "ws://localhost:8080/ws",
@@ -30,11 +30,16 @@ function Game() {
                     body: `Websocket connected with ID: ${message.payload.connectionId}`,
                 });
                 break;
+            case "GAME_STATE":
+                updateGameSettings({ id: message.payload.game_id, fen: message.payload.board_fen });
+                break;
             case "GAME_CREATED":
+                updateGameSettings({ id: message.payload.game_id, fen: message.payload.initial_fen });
                 break;
             case "GAME_OVER":
                 break;
             case "ENGINE_MOVE":
+                makeEngineMove(message.payload.move);
                 break;
             case "CLOCK_UPDATE":
                 updateTime(message.payload.remaining, message.payload.color);
@@ -49,6 +54,13 @@ function Game() {
                 break;
         }
     }
+
+    const makePlayerMove = (move: string) => {
+        if (gameSettings.id) {
+            const message: OutboundMessage = { event: "MAKE_MOVE", payload: { game_id: gameSettings.id, move: move } };
+            sendMessage(message);
+        }
+    };
 
     return (
         <>
@@ -82,7 +94,7 @@ function Game() {
             <div className="container mx-auto flex flex-col justify-center gap-4 p-4 lg:flex-row">
                 <div className="flex gap-2">
                     <Evaluation />
-                    <Board />
+                    <Board makePlayerMove={makePlayerMove} />
                 </div>
                 <MoveHistory />
             </div>

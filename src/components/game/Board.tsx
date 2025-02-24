@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import type { Square as SquareType, PieceSymbol, Move } from "chess.js";
 
@@ -9,9 +9,14 @@ import { Ranks, Files } from "@/constants/board";
 
 import { useChess } from "@/context/ChessContext";
 
-function Board() {
+type Props = {
+    makePlayerMove: (move: string) => void;
+};
+
+function Board({ makePlayerMove }: Props) {
     const boardRef = useRef<HTMLDivElement>(null);
-    const { chess, createBoard, isAtTheTop, isAtTheBottom, addToHistory, capturePiece } = useChess();
+    const { chess, boardState, updateBoardState, createBoard, isAtTheTop, isAtTheBottom, addToHistory, capturePiece } =
+        useChess();
 
     const [fromSq, setFromSq] = useState<string | undefined>(undefined);
 
@@ -21,8 +26,6 @@ function Board() {
         square: string | null;
         color: "w" | "b";
     }>({ visible: false, position: { x: 0, y: 0 }, square: null, color: "w" });
-
-    const [boardState, setBoardState] = useState<Array<React.JSX.Element>>(createBoard(chess.board(), []));
 
     function onDragStart(e: DragStartEvent) {
         const startSquare = e.active.data.current?.sq;
@@ -84,6 +87,7 @@ function Board() {
         try {
             const move = chess.move({ from: fromSq, to: endSquare });
             addToHistory(move);
+            makePlayerMove(move.lan);
 
             if (move?.captured) {
                 capturePiece(move.captured as PieceSymbol, move.color);
@@ -94,7 +98,7 @@ function Board() {
                 elem.classList.remove("possible-move");
             });
 
-            setBoardState(createBoard(chess.board(), [], fromSq, endSquare));
+            updateBoardState(createBoard(chess.board(), [], fromSq, endSquare));
         } catch (error) {
             console.error("Invalid move", error);
         }
@@ -107,12 +111,22 @@ function Board() {
                 to: promotionPopup.square,
                 promotion: piece.at(0),
             });
+
             addToHistory(move);
+            makePlayerMove(move.lan);
             if (move?.captured) {
                 capturePiece(move.captured as PieceSymbol, move.color);
             }
 
-            setBoardState(createBoard(chess.board(), [], fromSq, promotionPopup.square));
+            const elems = document.querySelectorAll(`.possible-move`);
+            elems.forEach((elem) => {
+                elem.classList.remove("possible-move");
+            });
+
+            // re-create board after move
+            updateBoardState(createBoard(chess.board(), [], fromSq, promotionPopup.square));
+
+            // Reset Promotion popup
             setPromotionPopup({
                 visible: false,
                 position: { x: 0, y: 0 },
