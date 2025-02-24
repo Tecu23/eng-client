@@ -5,14 +5,19 @@ import type { Square as SquareType, PieceSymbol, Move } from "chess.js";
 import { DndContext } from "@dnd-kit/core";
 import type { DragEndEvent, DragStartEvent } from "@dnd-kit/core";
 
-import { Ranks, Files } from "@/constants/board";
+import { Ranks, Files, StartPosition } from "@/constants/board";
 
 import { useChess } from "@/context/ChessContext";
+import { usePopUp } from "@/context/PopUpContext";
+
 import useWebsocket from "@/hooks/useWebSocket";
+
+import { OutboundMessage } from "src/utilities/messages/outboundMessages";
+import { InboundMessage } from "src/utilities/messages/inboundMessages";
 
 function Board() {
     const boardRef = useRef<HTMLDivElement>(null);
-    const { chess, createBoard, isAtTheTop, isAtTheBottom, addToHistory, capturePiece } = useChess();
+    const { chess, updateTime, createBoard, isAtTheTop, isAtTheBottom, addToHistory, capturePiece } = useChess();
 
     const [fromSq, setFromSq] = useState<string | undefined>(undefined);
 
@@ -23,9 +28,42 @@ function Board() {
         color: "w" | "b";
     }>({ visible: false, position: { x: 0, y: 0 }, square: null, color: "w" });
 
-    const { sendMessage, isConnected } = useWebsocket(import.meta.env.VITE_WEBSOCKET_PATH || "ws://localhost:8080");
+    const { sendMessage, isConnected } = useWebsocket(
+        import.meta.env.VITE_WEBSOCKET_PATH || "ws://localhost:8080/ws",
+        handleMessages,
+    );
+
+    const { triggerPopUp } = usePopUp();
 
     const [boardState, setBoardState] = useState<Array<React.JSX.Element>>(createBoard(chess.board(), []));
+
+    function handleMessages(message: InboundMessage) {
+        switch (message.event) {
+            case "CONNECTED":
+                triggerPopUp({
+                    header: "Connection Established",
+                    body: `Websocket connected with ID: ${message.payload.connectionId}`,
+                });
+                break;
+            case "GAME_CREATED":
+                break;
+            case "GAME_OVER":
+                break;
+            case "ENGINE_MOVE":
+                break;
+            case "CLOCK_UPDATE":
+                updateTime(message.payload.remaining, message.payload.color);
+                break;
+            case "ERROR":
+                triggerPopUp({
+                    header: "Error",
+                    body: `${message.payload.message}`,
+                });
+                break;
+            default:
+                break;
+        }
+    }
 
     function onDragStart(e: DragStartEvent) {
         const startSquare = e.active.data.current?.sq;
@@ -126,20 +164,22 @@ function Board() {
     }
 
     useEffect(() => {
-        console.log(isConnected);
         if (isConnected) {
-            const payload = {
-                color: "white",
-                time_control: {
-                    white_time: 300,
-                    black_time: 300,
-                    white_increment: 0,
-                    black_increment: 0,
-                    moves_to_go: 40,
+            const message: OutboundMessage = {
+                event: "CREATE_SESSION",
+                payload: {
+                    color: "w",
+                    time_control: {
+                        white_time: 600_000,
+                        black_time: 600_000,
+                        white_increment: 0,
+                        black_increment: 0,
+                    },
+                    initial_fen: StartPosition,
                 },
             };
 
-            sendMessage({ type: "START_NEW_GAME", payload: payload });
+            sendMessage(message);
         }
     }, [isConnected]);
 

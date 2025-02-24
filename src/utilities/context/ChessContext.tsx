@@ -30,6 +30,9 @@ type Props = {
 const ChessProvider = ({ children }: Props) => {
     const [chess] = useState(new Chess());
 
+    const [whiteTime, setWhiteTime] = useState(600_000);
+    const [blackTime, setBlackTime] = useState(600_000);
+
     const [moveHistory, setMoveHistory] = useState<Move[]>([]);
     const [possibleMoves, setPossibleMoves] = useState<Move[]>([]);
 
@@ -50,6 +53,14 @@ const ChessProvider = ({ children }: Props) => {
             setCapturedWhitePieces((prev) => [...prev, piece]);
         }
     };
+
+    const updateTime = useCallback((time: number, player: Color) => {
+        if (player == "w") {
+            setWhiteTime(time);
+        } else {
+            setBlackTime(time);
+        }
+    }, []);
 
     const createBoard = useCallback(
         (
@@ -107,6 +118,11 @@ const ChessProvider = ({ children }: Props) => {
         <ChessContext.Provider
             value={{
                 chess, // Should probably remove chess from here
+
+                whiteTime,
+                blackTime,
+
+                updateTime,
 
                 createBoard,
 

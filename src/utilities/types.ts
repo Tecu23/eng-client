@@ -17,6 +17,12 @@ export interface ChessContextValue {
     ) => Array<React.JSX.Element>;
 
     chess: Chess;
+
+    whiteTime: number;
+    blackTime: number;
+
+    updateTime: (time: number, player: Color) => void;
+
     possibleMoves: Move[];
 
     moveHistory: Move[];
@@ -31,3 +37,15 @@ export interface ChessContextValue {
 
     capturePiece: (piece: PieceSymbol, color: Color) => void;
 }
+
+export interface PopUpContextValue {
+    open: boolean;
+    popUpData: PopUpDataType | null;
+    triggerPopUp: (data: PopUpDataType) => void;
+    closePopUp: () => void;
+}
+
+export type PopUpDataType = {
+    header: string;
+    body: string;
+};

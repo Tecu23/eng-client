@@ -3,7 +3,10 @@ import { Color } from "chess.js";
 type InboundMessagesPayloadMap = {
     CONNECTED: { connectionId: string };
     GAME_CREATED: { game_id: string; initial_fen: string; white_time: number; black_time: number; current_turn: Color };
-    TIME_UPDATE: { color: Color; remaining: number };
+    GAME_OVER: { game_id: string; result: string };
+    ENGINE_MOVE: { game_id: string; move: string };
+    CLOCK_UPDATE: { color: Color; remaining: number };
+    ERROR: { message: string };
 };
 
 export type InboundMessage = {

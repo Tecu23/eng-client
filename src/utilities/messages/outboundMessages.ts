@@ -12,7 +12,7 @@ type OutboundMessagesPayloadMap = {
         color: Color;
         initial_fen: string;
     };
-    MAKE_MOVE: { game_session: string };
+    MAKE_MOVE: { game_id: string; move: string };
 };
 
 export type OutboundMessage = {

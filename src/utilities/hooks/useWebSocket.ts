@@ -1,16 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 
-interface WebSocketMessage {
-    type: string;
-    payload: any;
-}
+import { OutboundMessage } from "../messages/outboundMessages";
+import { InboundMessage } from "../messages/inboundMessages";
 
 interface useWebSocketReturn {
-    sendMessage: (message: WebSocketMessage) => void;
+    sendMessage: (message: OutboundMessage) => void;
     isConnected: boolean;
 }
 
-const useWebsocket = (url: string): useWebSocketReturn => {
+const useWebsocket = (url: string, callback: (m: InboundMessage) => void): useWebSocketReturn => {
     const [isConnected, setIsConnected] = useState(false);
     const webSocketRef = useRef<WebSocket | null>(null);
 
@@ -26,8 +24,9 @@ const useWebsocket = (url: string): useWebSocketReturn => {
         };
 
         ws.onmessage = (e) => {
-            const message = JSON.parse(e.data);
+            const message: InboundMessage = JSON.parse(e.data);
             console.log("Message from server:", message);
+            callback(message);
 
             // Handle incoming messages here
         };
@@ -46,7 +45,7 @@ const useWebsocket = (url: string): useWebSocketReturn => {
         };
     }, [url]);
 
-    const sendMessage = (message: WebSocketMessage) => {
+    const sendMessage = (message: OutboundMessage) => {
         if (webSocketRef.current && webSocketRef.current.readyState === WebSocket.OPEN) {
             webSocketRef.current.send(JSON.stringify(message));
         }
