@@ -11,6 +11,10 @@ export interface PieceType {
 export type GameSettings = {
     id: string | null;
     fen: string | null;
+    whiteTime: number;
+    blackTime: number;
+    whiteIncrement: number;
+    blackIncrement: number;
 };
 
 export interface ChessContextValue {
@@ -28,8 +32,6 @@ export interface ChessContextValue {
     gameSettings: GameSettings;
     updateGameSettings: (settings: GameSettings) => void;
 
-    whiteTime: number;
-    blackTime: number;
     updateTime: (time: number, player: Color) => void;
 
     possibleMoves: Move[];

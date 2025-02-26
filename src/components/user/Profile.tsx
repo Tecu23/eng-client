@@ -26,7 +26,9 @@ const Profile = ({ capturedPieces, color, name, time, elo }: Props) => {
         <>
             <div className="flex items-center gap-2 px-4 py-2">
                 <div className="flex h-12 w-24 items-center justify-center rounded-md bg-green-200">
-                    <p className="font-mono text-xl font-semibold">{formatTime(time)}</p>
+                    <p className="font-mono text-xl font-semibold">
+                        {time == 0 ? formatTime(300_000) : formatTime(time)}
+                    </p>
                 </div>
                 <div className="h-16 w-16 flex-auto flex-shrink-0 flex-grow-0">
                     <img src={`pieces/rook_${color}.svg`} alt="computer_profile" className="h-full w-full" />

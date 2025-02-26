@@ -33,10 +33,11 @@ const ChessProvider = ({ children }: Props) => {
     const [gameSettings, setGameSettings] = useState<GameSettings>({
         id: null,
         fen: null,
+        blackTime: 0,
+        blackIncrement: 0,
+        whiteTime: 0,
+        whiteIncrement: 0,
     });
-
-    const [whiteTime, setWhiteTime] = useState(600_000);
-    const [blackTime, setBlackTime] = useState(600_000);
 
     const [moveHistory, setMoveHistory] = useState<Move[]>([]);
     const [possibleMoves, setPossibleMoves] = useState<Move[]>([]);
@@ -47,9 +48,12 @@ const ChessProvider = ({ children }: Props) => {
     const isAtTheTop = (sq: SquareType) => sq.includes("8");
     const isAtTheBottom = (sq: SquareType) => sq.includes("1");
 
-    const addToHistory = (move: Move) => {
-        setMoveHistory([...moveHistory, move]);
-    };
+    const addToHistory = useCallback(
+        (move: Move) => {
+            setMoveHistory([...moveHistory, move]);
+        },
+        [moveHistory],
+    );
 
     const [boardState, setBoardState] = useState<Array<React.JSX.Element>>([]);
 
@@ -62,11 +66,13 @@ const ChessProvider = ({ children }: Props) => {
     };
 
     const updateTime = useCallback((time: number, player: Color) => {
-        if (player == "w") {
-            setWhiteTime(time);
-        } else {
-            setBlackTime(time);
-        }
+        setGameSettings((prev) => {
+            return {
+                ...prev,
+                whiteTime: player == "w" ? time : prev.whiteTime,
+                blackTime: player == "b" ? time : prev.blackTime,
+            };
+        });
     }, []);
 
     const updateGameSettings = useCallback((settings: GameSettings) => {
@@ -167,8 +173,6 @@ const ChessProvider = ({ children }: Props) => {
                 gameSettings,
                 updateGameSettings,
 
-                whiteTime,
-                blackTime,
                 updateTime,
 
                 makeEngineMove,

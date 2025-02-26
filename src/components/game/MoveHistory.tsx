@@ -12,12 +12,24 @@ import {
 import { FlagIcon } from "@heroicons/react/24/outline";
 
 const MoveHistory = () => {
-    const { whiteTime, blackTime, capturedBlackPieces, capturedWhitePieces } = useChess();
+    const { gameSettings, capturedBlackPieces, capturedWhitePieces } = useChess();
 
     return (
         <div className="bg-square-light max-w-[590px] flex-shrink flex-grow">
-            <Profile capturedPieces={capturedBlackPieces} time={blackTime} color="b" name="ArGoX" elo="9999" />
-            <Profile capturedPieces={capturedWhitePieces} time={whiteTime} color="w" name="Challenger" elo="200" />
+            <Profile
+                capturedPieces={capturedBlackPieces}
+                time={gameSettings.blackTime}
+                color="b"
+                name="ArGoX"
+                elo="9999"
+            />
+            <Profile
+                capturedPieces={capturedWhitePieces}
+                time={gameSettings.whiteTime}
+                color="w"
+                name="Challenger"
+                elo="200"
+            />
             <div className="flex h-8 w-full items-center justify-around border">
                 <ChevronLeftIcon className="h-8 w-8" />
                 <ChevronDoubleLeftIcon className="h-8 w-8" />

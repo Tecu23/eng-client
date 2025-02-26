@@ -19,16 +19,15 @@ const useWebsocket = (url: string, callback: (m: InboundMessage) => void): useWe
 
         ws.onopen = () => {
             setIsConnected(true);
-
             console.log("Websocket connected");
         };
 
         ws.onmessage = (e) => {
             const message: InboundMessage = JSON.parse(e.data);
             console.log("Message from server:", message);
-            callback(message);
 
             // Handle incoming messages here
+            callback(message);
         };
 
         ws.onclose = () => {

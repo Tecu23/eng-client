@@ -27,14 +27,28 @@ function Game() {
             case "CONNECTED":
                 triggerPopUp({
                     header: "Connection Established",
-                    body: `Websocket connected with ID: ${message.payload.connectionId}`,
+                    body: `Websocket connected with ID: ${message.payload.connection_id}`,
                 });
                 break;
             case "GAME_STATE":
-                updateGameSettings({ id: message.payload.game_id, fen: message.payload.board_fen });
+                updateGameSettings({
+                    id: message.payload.game_id,
+                    fen: message.payload.board_fen,
+                    whiteTime: message.payload.white_time,
+                    blackTime: message.payload.black_time,
+                    whiteIncrement: message.payload.white_increment,
+                    blackIncrement: message.payload.black_increment,
+                });
                 break;
             case "GAME_CREATED":
-                updateGameSettings({ id: message.payload.game_id, fen: message.payload.initial_fen });
+                updateGameSettings({
+                    id: message.payload.game_id,
+                    fen: message.payload.initial_fen,
+                    whiteTime: message.payload.white_time,
+                    blackTime: message.payload.black_time,
+                    whiteIncrement: message.payload.white_increment,
+                    blackIncrement: message.payload.black_increment,
+                });
                 break;
             case "GAME_OVER":
                 break;
@@ -73,8 +87,8 @@ function Game() {
                                 payload: {
                                     color: "w",
                                     time_control: {
-                                        white_time: 600_000,
-                                        black_time: 600_000,
+                                        white_time: 300_000,
+                                        black_time: 300_000,
                                         white_increment: 0,
                                         black_increment: 0,
                                     },
