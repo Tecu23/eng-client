@@ -12,7 +12,11 @@ import { useChess } from "@/context/ChessContext";
 import { usePopUp } from "@/context/PopUpContext";
 import { StartPosition } from "@/constants/board";
 
+import notifySound from "@/assets/sounds/notify.mp3";
+
 function Game() {
+    const notifyAudio = new Audio(notifySound);
+
     const { triggerPopUp } = usePopUp();
 
     const { updateTime, gameSettings, updateGameSettings, makeEngineMove } = useChess();
@@ -49,6 +53,7 @@ function Game() {
                     whiteIncrement: message.payload.white_increment,
                     blackIncrement: message.payload.black_increment,
                 });
+                notifyAudio.play();
                 break;
             case "GAME_OVER":
                 break;

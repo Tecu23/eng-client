@@ -34,7 +34,7 @@
       "@/hooks/*": [
         "src/utilities/hooks/*"
       ],
-      "@/images/*": [
+      "@/assets/*": [
         "src/assets/*"
       ],
       "@/constants/*": [

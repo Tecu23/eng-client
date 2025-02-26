@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import type { Square as SquareType, PieceSymbol, Move } from "chess.js";
 
@@ -9,11 +9,15 @@ import { Ranks, Files } from "@/constants/board";
 
 import { useChess } from "@/context/ChessContext";
 
+import moveSelfSound from "@/assets/sounds/promote.mp3";
+
 type Props = {
     makePlayerMove: (move: string) => void;
 };
 
 function Board({ makePlayerMove }: Props) {
+    const moveSelfAudio = new Audio(moveSelfSound);
+
     const boardRef = useRef<HTMLDivElement>(null);
     const { chess, boardState, updateBoardState, createBoard, isAtTheTop, isAtTheBottom, addToHistory, capturePiece } =
         useChess();
@@ -98,6 +102,7 @@ function Board({ makePlayerMove }: Props) {
                 elem.classList.remove("possible-move");
             });
 
+            moveSelfAudio.play();
             updateBoardState(createBoard(chess.board(), [], fromSq, endSquare));
         } catch (error) {
             console.error("Invalid move", error);
