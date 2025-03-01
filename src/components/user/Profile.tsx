@@ -24,8 +24,10 @@ const Profile = ({ capturedPieces, color, name, time, elo }: Props) => {
 
     return (
         <>
-            <div className="flex items-center gap-2 px-4 py-2">
-                <div className="flex h-12 w-24 items-center justify-center rounded-md bg-green-200">
+            <div
+                className={`flex ${color == "w" ? "bg-white" : "bg-piece"} h-20 flex-shrink-0 flex-grow-0 items-center gap-2 rounded-md px-4 py-2`}
+            >
+                <div className="flex h-12 w-24 items-center justify-center rounded-md bg-green-300">
                     <p className="font-mono text-xl font-semibold">
                         {time == 0 ? formatTime(300_000) : formatTime(time)}
                     </p>
@@ -34,9 +36,9 @@ const Profile = ({ capturedPieces, color, name, time, elo }: Props) => {
                     <img src={`pieces/rook_${color}.svg`} alt="computer_profile" className="h-full w-full" />
                 </div>
                 <div className="flex h-16 flex-shrink flex-grow flex-col">
-                    <div className="flex items-center gap-2">
-                        <p className="text-piece text-base font-semibold">{name}</p>
-                        <p className="text-piece text-base font-semibold">({elo})</p>
+                    <div className={`flex ${color == "w" ? "text-piece" : "text-square-light"} items-center gap-2`}>
+                        <p className={`text-base font-semibold`}>{name}</p>
+                        <p className="text-base font-semibold">({elo})</p>
                     </div>
                     <div className="relative flex flex-shrink flex-grow items-center justify-start">
                         <div
@@ -57,7 +59,7 @@ const Profile = ({ capturedPieces, color, name, time, elo }: Props) => {
                                                 width: "100%",
                                                 height: "100%",
 
-                                                backgroundImage: `url(${`pieces/pawn_${color}.svg`})`,
+                                                backgroundImage: `url(${`pieces/pawn_${color == "w" ? "b" : "w"}.svg`})`,
                                                 backgroundSize: "cover",
                                                 backgroundRepeat: "no-repeat",
                                             }}
@@ -84,7 +86,7 @@ const Profile = ({ capturedPieces, color, name, time, elo }: Props) => {
                                                 width: "100%",
                                                 height: "100%",
 
-                                                backgroundImage: `url(${`pieces/knight_${color}.svg`})`,
+                                                backgroundImage: `url(${`pieces/knight_${color == "w" ? "b" : "w"}.svg`})`,
                                                 backgroundSize: "cover",
                                                 backgroundRepeat: "no-repeat",
                                             }}
@@ -111,7 +113,7 @@ const Profile = ({ capturedPieces, color, name, time, elo }: Props) => {
                                                 width: "100%",
                                                 height: "100%",
 
-                                                backgroundImage: `url(${`pieces/bishop_${color}.svg`})`,
+                                                backgroundImage: `url(${`pieces/bishop_${color == "w" ? "b" : "w"}.svg`})`,
                                                 backgroundSize: "cover",
                                                 backgroundRepeat: "no-repeat",
                                             }}
@@ -138,7 +140,7 @@ const Profile = ({ capturedPieces, color, name, time, elo }: Props) => {
                                                 width: "100%",
                                                 height: "100%",
 
-                                                backgroundImage: `url(${`pieces/rook_${color}.svg`})`,
+                                                backgroundImage: `url(${`pieces/rook_${color == "w" ? "b" : "w"}.svg`})`,
                                                 backgroundSize: "cover",
                                                 backgroundRepeat: "no-repeat",
                                             }}
@@ -160,7 +162,7 @@ const Profile = ({ capturedPieces, color, name, time, elo }: Props) => {
                                                 width: "100%",
                                                 height: "100%",
 
-                                                backgroundImage: `url(${`pieces/queen_${color}.svg`})`,
+                                                backgroundImage: `url(${`pieces/queen_${color == "w" ? "b" : "w"}.svg`})`,
                                                 backgroundSize: "cover",
                                                 backgroundRepeat: "no-repeat",
                                             }}

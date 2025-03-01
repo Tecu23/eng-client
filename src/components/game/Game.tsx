@@ -1,7 +1,7 @@
 import Board from "@/components/game/Board";
 import Score from "@/components/game/Score";
 import Evaluation from "@/components/game/Evaluation";
-import MoveHistory from "@/components/game/MoveHistory";
+import BoardSidebar from "@/components/game/BoardSidebar";
 
 import { InboundMessage } from "src/utilities/messages/inboundMessages";
 import { OutboundMessage } from "src/utilities/messages/outboundMessages";
@@ -110,7 +110,7 @@ function Game() {
                 </button>
                 <Score />
             </div>
-            <div className="container mx-auto flex h-full w-full flex-col justify-center gap-4 p-4 lg:flex-row">
+            <div className="container mx-auto grid h-full w-full justify-items-center gap-4 p-4 lg:grid-cols-2">
                 <div
                     style={{
                         gridTemplateColumns: gameMode == "play" ? "1fr" : "3rem 1fr",
@@ -120,7 +120,7 @@ function Game() {
                     {gameMode == "analysis" ? <Evaluation value={0.0} /> : null}
                     <Board makePlayerMove={makePlayerMove} />
                 </div>
-                <MoveHistory />
+                <BoardSidebar />
             </div>
         </>
     );
