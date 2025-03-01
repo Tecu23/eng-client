@@ -1,5 +1,4 @@
 import Board from "@/components/game/Board";
-import Score from "@/components/game/Score";
 import Evaluation from "@/components/game/Evaluation";
 import BoardSidebar from "@/components/game/BoardSidebar";
 
@@ -10,18 +9,19 @@ import useWebsocket from "@/hooks/useWebSocket";
 
 import { useChess } from "@/context/ChessContext";
 import { usePopUp } from "@/context/PopUpContext";
-import { StartPosition } from "@/constants/board";
+// import { StartPosition } from "@/constants/board";
 
 import notifySound from "@/assets/sounds/notify.mp3";
+import { GameSettings } from "src/utilities/types";
 
 function Game() {
     const notifyAudio = new Audio(notifySound);
 
     const { triggerPopUp } = usePopUp();
 
-    const { updateTime, gameMode, gameSettings, updateGameSettings, makeEngineMove } = useChess();
+    const { updateTime, gameMode, gameSettings, setGameSettings, makeEngineMove } = useChess();
 
-    const { sendMessage, isConnected } = useWebsocket(
+    const { sendMessage } = useWebsocket(
         import.meta.env.VITE_WEBSOCKET_PATH || "ws://localhost:8080/ws",
         handleMessages,
     );
@@ -35,23 +35,29 @@ function Game() {
                 });
                 break;
             case "GAME_STATE":
-                updateGameSettings({
-                    id: message.payload.game_id,
-                    fen: message.payload.board_fen,
-                    whiteTime: message.payload.white_time,
-                    blackTime: message.payload.black_time,
-                    whiteIncrement: message.payload.white_increment,
-                    blackIncrement: message.payload.black_increment,
+                setGameSettings((prev: GameSettings) => {
+                    return {
+                        id: message.payload.game_id,
+                        fen: message.payload.board_fen,
+                        whiteTime: message.payload.white_time,
+                        blackTime: message.payload.black_time,
+                        whiteIncrement: message.payload.white_increment,
+                        blackIncrement: message.payload.black_increment,
+                        results: prev.results,
+                    };
                 });
                 break;
             case "GAME_CREATED":
-                updateGameSettings({
-                    id: message.payload.game_id,
-                    fen: message.payload.initial_fen,
-                    whiteTime: message.payload.white_time,
-                    blackTime: message.payload.black_time,
-                    whiteIncrement: message.payload.white_increment,
-                    blackIncrement: message.payload.black_increment,
+                setGameSettings((prev: GameSettings) => {
+                    return {
+                        id: message.payload.game_id,
+                        fen: message.payload.initial_fen,
+                        whiteTime: message.payload.white_time,
+                        blackTime: message.payload.black_time,
+                        whiteIncrement: message.payload.white_increment,
+                        blackIncrement: message.payload.black_increment,
+                        results: prev.results,
+                    };
                 });
                 notifyAudio.play();
                 break;
@@ -83,7 +89,7 @@ function Game() {
 
     return (
         <>
-            <div className="container mx-auto flex justify-between pt-4">
+            {/*<div className="container mx-auto flex justify-between pt-4">
                 <button
                     onClick={() => {
                         if (isConnected) {
@@ -108,14 +114,13 @@ function Game() {
                 >
                     New Game
                 </button>
-                <Score />
-            </div>
-            <div className="container mx-auto grid h-full w-full justify-items-center gap-4 p-4 lg:grid-cols-2">
+            </div>*/}
+            <div className="container mx-auto mt-24 grid h-full w-full justify-items-center gap-4 p-4 lg:grid-cols-2">
                 <div
                     style={{
                         gridTemplateColumns: gameMode == "play" ? "1fr" : "3rem 1fr",
                     }}
-                    className="grid w-full max-w-4xl flex-shrink flex-grow"
+                    className="grid w-full max-w-4xl flex-shrink flex-grow place-self-end"
                 >
                     {gameMode == "analysis" ? <Evaluation value={0.0} /> : null}
                     <Board makePlayerMove={makePlayerMove} />

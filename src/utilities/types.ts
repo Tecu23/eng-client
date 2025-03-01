@@ -15,6 +15,11 @@ export type GameSettings = {
     blackTime: number;
     whiteIncrement: number;
     blackIncrement: number;
+    results: {
+        wins: number;
+        loses: number;
+        draws: number;
+    };
 };
 
 export interface ChessContextValue {
@@ -33,7 +38,7 @@ export interface ChessContextValue {
     gameSettings: GameSettings;
 
     updateGameMode: (gm: GameMode) => void;
-    updateGameSettings: (settings: GameSettings) => void;
+    setGameSettings: React.Dispatch<React.SetStateAction<GameSettings>>;
 
     updateTime: (time: number, player: Color) => void;
 

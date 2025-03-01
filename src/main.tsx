@@ -6,11 +6,14 @@ import App from "./App.tsx";
 import { PopUpProvider } from "@/context/PopUpContext.tsx";
 
 import "./index.css";
+import { ChessProvider } from "@/context/ChessContext.tsx";
 
 createRoot(document.getElementById("root")!).render(
     <StrictMode>
-        <PopUpProvider>
-            <App />
-        </PopUpProvider>
+        <ChessProvider>
+            <PopUpProvider>
+                <App />
+            </PopUpProvider>
+        </ChessProvider>
     </StrictMode>,
 );

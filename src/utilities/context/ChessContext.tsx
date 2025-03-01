@@ -38,6 +38,11 @@ const ChessProvider = ({ children }: Props) => {
         blackIncrement: 0,
         whiteTime: 0,
         whiteIncrement: 0,
+        results: {
+            wins: 0,
+            loses: 0,
+            draws: 0,
+        },
     });
 
     const [moveHistory, setMoveHistory] = useState<Move[]>([]);
@@ -74,10 +79,6 @@ const ChessProvider = ({ children }: Props) => {
                 blackTime: player == "b" ? time : prev.blackTime,
             };
         });
-    }, []);
-
-    const updateGameSettings = useCallback((settings: GameSettings) => {
-        setGameSettings(settings);
     }, []);
 
     const updateBoardState = useCallback((b: Array<React.JSX.Element>) => {
@@ -178,7 +179,7 @@ const ChessProvider = ({ children }: Props) => {
                 gameMode,
                 gameSettings,
                 updateGameMode,
-                updateGameSettings,
+                setGameSettings,
 
                 updateTime,
 

@@ -32,7 +32,7 @@ const BoardSidebar = () => {
     };
 
     return (
-        <div className="flex h-full w-full min-w-60 flex-col justify-between gap-4 rounded-lg lg:max-w-xl">
+        <div className="flex h-full w-full min-w-60 flex-col justify-between gap-4 place-self-end rounded-lg lg:max-w-xl">
             <Profile
                 capturedPieces={capturedBlackPieces}
                 time={gameSettings.blackTime}
