@@ -8,7 +8,7 @@ import { usePopUp } from "@/context/PopUpContext";
 const App = () => {
     const { open } = usePopUp();
     return (
-        <main className="relative">
+        <main className="bg-piece relative min-h-screen">
             <Header />
             <ChessProvider>
                 <Game />

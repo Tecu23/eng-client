@@ -10,6 +10,7 @@ import { Ranks, Files } from "@/constants/board";
 import { useChess } from "@/context/ChessContext";
 
 import moveSelfSound from "@/assets/sounds/promote.mp3";
+import { XMarkIcon } from "@heroicons/react/20/solid";
 
 type Props = {
     makePlayerMove: (move: string) => void;
@@ -143,10 +144,10 @@ function Board({ makePlayerMove }: Props) {
 
     return (
         <>
-            <div className="relative h-[544px] w-[544px] rounded-md border border-gray-400">
-                <div className="relative flex h-full w-full items-center justify-center rounded-lg bg-white p-8">
+            <div className="relative aspect-square w-full rounded-md">
+                <div className="relative flex h-full w-full items-center justify-center rounded-lg bg-white">
                     <DndContext onDragStart={onDragStart} onDragEnd={onDragEnd}>
-                        <div ref={boardRef} className="grid h-[480px] w-[480px] grid-cols-8 grid-rows-8">
+                        <div ref={boardRef} className="grid aspect-square w-full grid-cols-8 grid-rows-8">
                             {boardState}
                         </div>
                     </DndContext>
@@ -154,11 +155,12 @@ function Board({ makePlayerMove }: Props) {
                         <div
                             style={{
                                 position: "absolute",
-                                left: promotionPopup.position.x,
-                                top: promotionPopup.position.y,
+                                top: 0,
+                                left: 0,
                                 zIndex: 20,
+                                boxShadow: "3px 3px 10px rgba(0,0,0,0.65)",
                             }}
-                            className="flex h-[288px] w-[68px] flex-col items-center justify-center rounded bg-white p-1 shadow-md"
+                            className="flex h-[56.25%] w-[12.5%] translate-x-[200%] transform flex-col items-center justify-center rounded bg-white"
                         >
                             {["queen", "rook", "bishop", "knight"].map((piece) => {
                                 return (
@@ -166,7 +168,7 @@ function Board({ makePlayerMove }: Props) {
                                         type="button"
                                         key={piece}
                                         onClick={() => handlePromotionChoice(piece as PieceSymbol)}
-                                        className="flex h-[60px] w-[60px] items-center justify-center bg-white"
+                                        className="flex h-full w-full items-center justify-center hover:bg-gray-100"
                                     >
                                         <div
                                             style={{
@@ -181,29 +183,27 @@ function Board({ makePlayerMove }: Props) {
                                     </button>
                                 );
                             })}
+                            <div className="flex h-[11.11%] w-full flex-grow items-center justify-center bg-gray-100">
+                                <XMarkIcon className="h-full w-full" />
+                            </div>
                         </div>
                     )}
-                    {/* Ranks and Files Markers */}
-                    <div className="absolute top-0 left-0 flex h-full w-8 flex-col items-center justify-start bg-transparent pt-6">
-                        {Ranks.slice()
-                            .reverse()
-                            .map((num: number) => (
-                                <p
-                                    key={num}
-                                    className="flex h-[60px] w-2 items-center justify-center text-xl font-medium"
-                                >
-                                    {num}
-                                </p>
-                            ))}
-                    </div>
-                    <div className="absolute bottom-0 left-0 flex h-8 w-full flex-row items-center justify-end bg-transparent pr-6">
-                        {Files.map((num) => (
-                            <p
-                                key={num}
-                                className="flex h-2 w-[60px] items-center justify-center text-xl font-medium uppercase"
+                    <div className="absolute bottom-0 left-0 flex w-full">
+                        {Files.map((f, idx) => (
+                            <div
+                                className={`flex w-[12.5%] items-end justify-end px-1 py-3 text-lg leading-0 font-semibold ${idx % 2 == 1 ? "text-square-light" : "text-square-dark"}`}
                             >
-                                {num}
-                            </p>
+                                {f}
+                            </div>
+                        ))}
+                    </div>
+                    <div className="absolute top-0 left-0 flex h-full flex-col-reverse">
+                        {Ranks.map((r, idx) => (
+                            <div
+                                className={`flex h-[12.5%] items-start justify-end px-1 py-3 text-lg leading-1 font-semibold ${idx % 2 == 1 ? "text-square-light" : "text-square-dark"}`}
+                            >
+                                {r}
+                            </div>
                         ))}
                     </div>
                 </div>

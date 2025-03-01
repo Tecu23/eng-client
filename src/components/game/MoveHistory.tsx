@@ -15,7 +15,7 @@ const MoveHistory = () => {
     const { gameSettings, capturedBlackPieces, capturedWhitePieces } = useChess();
 
     return (
-        <div className="bg-square-light max-w-[590px] flex-shrink flex-grow">
+        <div className="bg-square-light/50 w-full min-w-60 flex-grow lg:max-w-xl">
             <Profile
                 capturedPieces={capturedBlackPieces}
                 time={gameSettings.blackTime}

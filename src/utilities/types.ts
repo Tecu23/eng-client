@@ -29,7 +29,10 @@ export interface ChessContextValue {
 
     chess: Chess;
 
+    gameMode: GameMode;
     gameSettings: GameSettings;
+
+    updateGameMode: (gm: GameMode) => void;
     updateGameSettings: (settings: GameSettings) => void;
 
     updateTime: (time: number, player: Color) => void;
@@ -62,3 +65,7 @@ export type PopUpDataType = {
     header: string;
     body: string;
 };
+
+export type GameMode = "play" | "analysis";
+
+export interface GameContextValue {}

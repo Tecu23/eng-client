@@ -19,7 +19,7 @@ function Game() {
 
     const { triggerPopUp } = usePopUp();
 
-    const { updateTime, gameSettings, updateGameSettings, makeEngineMove } = useChess();
+    const { updateTime, gameMode, gameSettings, updateGameSettings, makeEngineMove } = useChess();
 
     const { sendMessage, isConnected } = useWebsocket(
         import.meta.env.VITE_WEBSOCKET_PATH || "ws://localhost:8080/ws",
@@ -110,9 +110,14 @@ function Game() {
                 </button>
                 <Score />
             </div>
-            <div className="container mx-auto flex flex-col justify-center gap-4 p-4 lg:flex-row">
-                <div className="flex gap-2">
-                    <Evaluation />
+            <div className="container mx-auto flex h-full w-full flex-col justify-center gap-4 p-4 lg:flex-row">
+                <div
+                    style={{
+                        gridTemplateColumns: gameMode == "play" ? "1fr" : "3rem 1fr",
+                    }}
+                    className="grid w-full max-w-4xl flex-shrink flex-grow"
+                >
+                    {gameMode == "analysis" ? <Evaluation value={0.0} /> : null}
                     <Board makePlayerMove={makePlayerMove} />
                 </div>
                 <MoveHistory />

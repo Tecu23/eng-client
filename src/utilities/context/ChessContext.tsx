@@ -7,7 +7,7 @@ import Piece from "@/components/game/Piece";
 import { Chess } from "chess.js";
 import type { Color, Move, PieceSymbol, Square as SquareType } from "chess.js";
 
-import type { ChessContextValue, GameSettings } from "../types";
+import type { ChessContextValue, GameMode, GameSettings } from "../types";
 
 import { Files, Ranks, pc2Text } from "@/constants/board";
 
@@ -30,6 +30,7 @@ type Props = {
 const ChessProvider = ({ children }: Props) => {
     const [chess] = useState(new Chess());
 
+    const [gameMode, setGameMode] = useState<GameMode>("play");
     const [gameSettings, setGameSettings] = useState<GameSettings>({
         id: null,
         fen: null,
@@ -82,6 +83,10 @@ const ChessProvider = ({ children }: Props) => {
     const updateBoardState = useCallback((b: Array<React.JSX.Element>) => {
         setBoardState(b);
     }, []);
+
+    const updateGameMode = (gm: GameMode) => {
+        setGameMode(gm);
+    };
 
     const createBoard = useCallback(
         (
@@ -170,7 +175,9 @@ const ChessProvider = ({ children }: Props) => {
                 updateBoardState,
                 createBoard,
 
+                gameMode,
                 gameSettings,
+                updateGameMode,
                 updateGameSettings,
 
                 updateTime,
